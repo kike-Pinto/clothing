@@ -4,6 +4,7 @@ import {
   signInWithRedirect,
   signInWithPopup,
   GoogleAuthProvider,
+  createUserWithEmailAndPassword,
 } from 'firebase/auth'
 
 import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore'
@@ -21,21 +22,24 @@ const firebaseConfig = {
 // Initialize Firebase
 const firebaseApp = initializeApp(firebaseConfig)
 
-const provider = new GoogleAuthProvider()
+const googleProvider = new GoogleAuthProvider()
 
 //setCustomParameters = parametro personalizado que contiene la clave que indica la documentacion del proveedor OAuth y su valor correspondiente
-provider.setCustomParameters({
+googleProvider.setCustomParameters({
   prompt: 'select_account',
 })
 
 export const auth = getAuth()
-export const signInWithGooglePopup = () => signInWithPopup(auth, provider)
+export const signInWithGooglePopup = () => signInWithPopup(auth, googleProvider)
+export const signInWithGoogleRedirect = () =>
+  signInWithRedirect(auth, googleProvider)
 
 //we use getFirestore in order to use the batabase
 export const db = getFirestore()
 
 //getting the data from authentication service
 export const createUserDocumentFromAuth = async (userAuth) => {
+  if (!userAuth) return
   //doc has 3 arguments
   //1 database
   //2 collection
@@ -70,4 +74,9 @@ export const createUserDocumentFromAuth = async (userAuth) => {
 
   //if user data exists
   //return userDocRef
+}
+
+export const createAuthUserWithEmailAndPassword = async (email, password) => {
+  if (!email || !password) return
+  return await createUserWithEmailAndPassword(auth, email, password)
 }
